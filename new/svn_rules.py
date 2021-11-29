@@ -8,4 +8,4 @@ class SVNLogRules:
         self._rules = rules
 
     def select_one_rule(self, repo, txn):
-        pass
+        self._rules.sort(reverse=True)

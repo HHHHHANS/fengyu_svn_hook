@@ -6,6 +6,7 @@ from information import get_code_view_config_path
 from svn_config import SVNConfig
 from svn_rules import SVNLogRules
 
+
 def run():
     # 获取输入：包括仓库地址repos、上下文数字txn
     # env = 'online'为线上环境输入; env = 'test' 为获取测试环境输入
