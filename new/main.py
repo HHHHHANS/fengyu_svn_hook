@@ -62,6 +62,19 @@ def run():
         sys.exit(1)
 
 
+# class Svn_Log_Checker:
+#
+#     def __init__(self):
+#         self._repos = None
+#         self._txn = None
+#
+#     def get_repo_and_txn(self):
+#         """ 获取程序启动参数: 线上环境的仓库地址、上下文数字txn"""
+#         repos = sys.argv[1]
+#         txn = sys.argv[2]
+#         return repos, txn
+
+
 if __name__ == '__main__':
     # 程序启动
     run()
