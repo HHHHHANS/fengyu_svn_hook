@@ -3,7 +3,7 @@ import sys
 from common import debug
 from information import get_input
 from information import get_code_view_config_path
-from svn_config import SVNConfig
+from svn_config import SVNConfig, Svn_Cmd
 from svn_rules import SVNLogRules
 
 
@@ -37,9 +37,31 @@ def run():
     # 获取配置文件中规则，并初始化为规则管理类
     rules = SVNLogRules(svn_config.rules())
 
+    #
+    sp_rule = rules.select_one_rule(repo=repos, txn=txn)
+    if not sp_rule:
+        debug('not rule found.')
+        sys.exit(1)
 
+    debug('select rule: %s' % sp_rule)
+    # 获取特定section下的配置信息
+    args = svn_config.extract_args_from_config(sp_rule)
+    debug('repository options: %s' % args)
+    # 检查是否在该section下启用日志检查规则
+    if not svn_config.is_logcheck_enable(args=args):
+        debug('{}\'s log check is not enabled'.format(sp_rule))
+        sys.exit(1)
 
+    log_str = Svn_Cmd.get_log_str(repo=repos, txn=txn)
+    log_rules = SVNConfig.log_rules_in_section(args=args)
+
+    try:
+        rules.check_log_is_ok(log_str=log_str, log_rules=log_rules)
+    except Exception as e:
+        debug(e)
+        sys.exit(1)
 
 
 if __name__ == '__main__':
+    # 程序启动
     run()
