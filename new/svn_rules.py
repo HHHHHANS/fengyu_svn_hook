@@ -1,7 +1,7 @@
 # coding=utf-8
 # 本文件为管理svn日志格式的规则类
-from svn_config import Svn_Cmd
-from common import SvnError
+from new.svn_config import Svn_Cmd
+from new.common import SvnError
 import re
 
 

@@ -1,10 +1,9 @@
 # coding=utf-8
 import sys
-from common import debug
-from information import get_input
-from information import get_code_view_config_path
-from svn_config import SVNConfig, Svn_Cmd
-from svn_rules import SVNLogRules
+from new.common import debug
+from new.information import Input
+from new.svn_config import SVNConfig, Svn_Cmd
+from new.svn_rules import SVNLogRules
 
 
 def run():
@@ -12,13 +11,13 @@ def run():
     # env = 'online'为线上环境输入; env = 'test' 为获取测试环境输入
     env = 'test'
     try:
-        repos, txn = get_input(env=env)
+        repos, txn = Input.get_input(env=env)
     except Exception as e:
         debug(e)
         sys.exit(1)
 
     # 获取测试环境的配置文件路径
-    test_cfg_path = get_code_view_config_path(env=env)
+    test_cfg_path = Input.get_code_view_config_path(env=env)
 
     # svn日志配置信息，包含变量和规则的预定义
     try:

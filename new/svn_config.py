@@ -11,19 +11,31 @@ from new.common import make_svnlook_cmd
 from new.common import Logger
 
 
+class CMDStringDangerousError(Exception):
+    """高危指令错误"""
+    pass
+
+
+class CMDOutputNotIllegalError(Exception):
+    """指令输出内容不合规错误"""
+    pass
+
+
 class Cmd:
     """命令类
 
     接收一个字符串，对内容进行安全性检查，输出其作为指令的输出内容
     """
-    def __init__(self, cmd):
+    def __init__(self, cmd=None):
+        self._output = None
         try:
             # 指令本身安全检查
-            self.cmd_safety(cmd)
+            if not self.cmd_is_checked(cmd):
+                raise CMDStringDangerousError('danger cmd')
             output = capture_output(cmd)
             # 指令输出内容安全检查
-            if not self.output_safety(output):
-                raise IOError('unsafe cmd output')
+            if not self.output_is_checked(output):
+                raise CMDOutputNotIllegalError('unsafe cmd output')
             self._output = output
         except Exception as e:
             raise e
@@ -32,13 +44,13 @@ class Cmd:
         return self._output
 
     @staticmethod
-    def cmd_safety(cmd):
-        # TODO 指令本身安全性检查；高危操作、指令类型、指令有效性检查
+    def cmd_is_checked(cmd):
+        # TODO 指令本身检查；高危操作、指令类型、指令有效性检查
         # raise 指令错误
         pass
 
     @staticmethod
-    def output_safety(output):
+    def output_is_checked(output):
         # TODO 指令输出安全检查；内容大小、敏感信息等检查
         # raise 指令输出错误
         pass
@@ -148,13 +160,27 @@ class Svn_Cmd:
     def make_dirs_change(repo, txn):
         """执行dirs-changed命令"""
         svn_cmd = make_svnlook_cmd(directive='dirs-changed', repos=repo, txn=txn)
-        cmd_inst = Cmd(svn_cmd)
-        return cmd_inst.output()
+        try:
+            cmd_inst = Cmd(svn_cmd)
+            return cmd_inst.output()
+        except (CMDOutputNotIllegalError,CMDStringDangerousError) as e:
+            Logger.error(e)
+        except Exception as e:
+            Logger.error(e)
+
+        return None
 
     @staticmethod
     def get_log_str(repo, txn):
         """根据仓库地址和上下文数字，获取需要被检查的日志语句"""
-        svm_cmd = make_svnlook_cmd(directive='log', repos=repo, txn=txn)
-        cmd_inst = Cmd(svm_cmd)
-        return cmd_inst.output()
+        svn_cmd = make_svnlook_cmd(directive='log', repos=repo, txn=txn)
+        try:
+            cmd_inst = Cmd(svn_cmd)
+            return cmd_inst.output()
+        except (CMDOutputNotIllegalError, CMDStringDangerousError) as e:
+            Logger.error(e)
+        except Exception as e:
+            Logger.error(e)
+
+        return None
 
